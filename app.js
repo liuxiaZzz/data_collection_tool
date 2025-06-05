@@ -80,6 +80,8 @@ if ('serviceWorker' in navigator) {
 const dataForm = document.getElementById('dataForm');
 const recordsList = document.getElementById('recordsList');
 const exportBtn = document.getElementById('exportBtn');
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
 
 // 创建自动保存状态提示元素
 const autoSaveStatus = document.createElement('div');
@@ -133,9 +135,29 @@ function isRecordComplete(record) {
     return record.initial && record.age && record.gender && record.type;
 }
 
-// 渲染记录列表
-function renderRecords() {
-    recordsList.innerHTML = records.map((record, index) => {
+// 搜索功能
+function filterRecords(searchTerm) {
+    const term = searchTerm.toLowerCase().trim();
+    const filteredRecords = records.filter(record => 
+        record.initial.toLowerCase().includes(term)
+    );
+    
+    // 更新搜索结果统计
+    if (term === '') {
+        searchResults.textContent = 'Showing all records';
+    } else {
+        searchResults.textContent = `Found ${filteredRecords.length} record(s)`;
+    }
+    
+    // 渲染过滤后的记录
+    renderRecords(filteredRecords, term);
+}
+
+// 修改渲染记录列表函数以支持搜索
+function renderRecords(recordsToRender = records, searchTerm = '') {
+    const recordsToShow = recordsToRender || records;
+    
+    recordsList.innerHTML = recordsToShow.map((record, index) => {
         const isComplete = isRecordComplete(record);
         const missingFields = [];
         
@@ -143,10 +165,17 @@ function renderRecords() {
         if (!record.gender) missingFields.push('Gender');
         if (!record.type) missingFields.push('Type');
         
+        // 高亮显示匹配的文本
+        let initialDisplay = record.initial;
+        if (searchTerm) {
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            initialDisplay = record.initial.replace(regex, '<span class="highlight">$1</span>');
+        }
+        
         return `
             <div class="record-item ${!isComplete ? 'incomplete' : ''}">
                 <div>
-                    Initial: ${record.initial}
+                    Initial: ${initialDisplay}
                     ${record.age ? ` | Age: ${record.age}` : ''}
                     ${record.gender ? ` | Gender: ${record.gender === 'male' ? 'Male' : 'Female'}` : ''}
                     ${record.type ? ` | Type: ${record.type}` : ''}
@@ -278,6 +307,11 @@ function restoreFormState() {
     }
     if (formState.type) document.getElementById('type').value = formState.type;
 }
+
+// 添加搜索事件监听器
+searchInput.addEventListener('input', (e) => {
+    filterRecords(e.target.value);
+});
 
 // 初始化
 function init() {
