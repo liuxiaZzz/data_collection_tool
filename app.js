@@ -66,7 +66,7 @@ const LAST_SAVE_DATE_KEY = 'last_save_date';
 // 注册Service Worker
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('sw.js', { scope: './' })
             .then(registration => {
                 console.log('ServiceWorker registration successful');
             })
@@ -128,22 +128,31 @@ function updateLanguage() {
     renderRecords();
 }
 
+// 检查记录是否完整
+function isRecordComplete(record) {
+    return record.initial && record.age && record.gender && record.type;
+}
+
 // 渲染记录列表
 function renderRecords() {
-    recordsList.innerHTML = records.map((record, index) => `
-        <div class="record-item">
-            <div>
-                ${record.initial ? `Initial: ${record.initial} | ` : ''}
-                Age: ${record.age} | 
-                Gender: ${record.gender === 'male' ? 'Male' : 'Female'} | 
-                Type: ${record.type}
+    recordsList.innerHTML = records.map((record, index) => {
+        const isComplete = isRecordComplete(record);
+        return `
+            <div class="record-item ${!isComplete ? 'incomplete' : ''}">
+                <div>
+                    ${record.initial ? `Initial: ${record.initial} | ` : '<span class="missing">Initial missing</span> | '}
+                    ${record.age ? `Age: ${record.age} | ` : '<span class="missing">Age missing</span> | '}
+                    ${record.gender ? `Gender: ${record.gender === 'male' ? 'Male' : 'Female'} | ` : '<span class="missing">Gender missing</span> | '}
+                    ${record.type ? `Type: ${record.type}` : '<span class="missing">Type missing</span>'}
+                    ${record.timestamp ? `<br>保存时间: ${new Date(record.timestamp).toLocaleString()}` : ''}
+                </div>
+                <div class="record-actions">
+                    <button class="edit-btn" onclick="window.location.href='edit.html?index=${index}'">Edit</button>
+                    <button class="delete-btn" onclick="deleteRecord(${index})">Delete</button>
+                </div>
             </div>
-            <div class="record-actions">
-                <button class="edit-btn" onclick="editRecord(${index})">Edit</button>
-                <button class="delete-btn" onclick="deleteRecord(${index})">Delete</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // 编辑记录
@@ -159,27 +168,25 @@ function editRecord(index) {
     document.querySelector('button[type="submit"]').textContent = 'Update';
 }
 
-// 保存新记录或更新现有记录
+// 保存新记录
 dataForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
-    const formData = {
-        initial: document.getElementById('initial').value,
-        age: document.getElementById('age').value,
-        gender: document.querySelector('input[name="gender"]:checked').value,
-        type: document.getElementById('type').value
-    };
-    
-    if (editingIndex === -1) {
-        // 新记录
-        records.push(formData);
-    } else {
-        // 更新现有记录
-        records[editingIndex] = formData;
-        editingIndex = -1;
-        document.querySelector('button[type="submit"]').textContent = 'Save';
+    const initial = document.getElementById('initial').value.trim();
+    if (!initial) {
+        alert('必须填写Initial才能保存！');
+        return;
     }
     
+    const formData = {
+        initial: initial,
+        age: document.getElementById('age').value,
+        gender: document.querySelector('input[name="gender"]:checked')?.value || '',
+        type: document.getElementById('type').value,
+        timestamp: new Date().getTime()
+    };
+    
+    records.push(formData);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
     renderRecords();
     dataForm.reset();
@@ -187,36 +194,37 @@ dataForm.addEventListener('submit', (e) => {
 
 // 删除记录
 function deleteRecord(index) {
-    if (confirm('Are you sure you want to delete this record?')) {
+    if (confirm('确定要删除这条记录吗？')) {
         records.splice(index, 1);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
         renderRecords();
-        
-        // 如果正在编辑被删除的记录，重置表单
-        if (editingIndex === index) {
-            dataForm.reset();
-            editingIndex = -1;
-            document.querySelector('button[type="submit"]').textContent = 'Save';
-        }
     }
 }
 
 // 导出数据
 function exportData(date = new Date().toLocaleDateString()) {
     if (records.length === 0) {
-        alert('No data to export');
+        alert('没有可导出的数据');
         return;
     }
     
-    const headers = ['Initial', 'Age', 'Gender', 'Type'];
+    // 检查是否所有记录都完整
+    const incompleteRecords = records.filter(record => !isRecordComplete(record));
+    if (incompleteRecords.length > 0) {
+        alert('还有未完成的记录，请先完成所有记录再导出！');
+        return;
+    }
+    
+    const headers = ['Initial', 'Age', 'Gender', 'Type', 'Timestamp'];
     
     const csvContent = [
         headers.join(','),
         ...records.map(record => [
             record.initial || '',
-            record.age,
+            record.age || '',
             record.gender === 'male' ? 'Male' : 'Female',
-            record.type
+            record.type || '',
+            record.timestamp ? new Date(record.timestamp).toLocaleString() : ''
         ].join(','))
     ].join('\n');
     
