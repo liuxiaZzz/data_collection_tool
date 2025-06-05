@@ -20,18 +20,18 @@
         <form id="dataForm">
             <div class="form-group">
                 <label for="initial">Initial:</label>
-                <input type="text" id="initial" maxlength="10">
+                <input type="text" id="initial" maxlength="10" required>
             </div>
             
             <div class="form-group">
                 <label for="age">Age:</label>
-                <input type="number" id="age" required min="0" max="150">
+                <input type="number" id="age" min="0" max="150">
             </div>
             
             <div class="form-group">
                 <label>Gender:</label>
                 <div class="radio-group">
-                    <input type="radio" id="male" name="gender" value="male" required>
+                    <input type="radio" id="male" name="gender" value="male">
                     <label for="male">Male</label>
                     <input type="radio" id="female" name="gender" value="female">
                     <label for="female">Female</label>
@@ -40,7 +40,7 @@
             
             <div class="form-group">
                 <label for="type">Type:</label>
-                <select id="type" required>
+                <select id="type">
                     <option value="">Select Type</option>
                     <option value="type1">Type 1</option>
                     <option value="type2">Type 2</option>

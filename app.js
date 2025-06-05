@@ -57,7 +57,7 @@ const translations = {
 };
 
 // 当前语言
-let currentLang = 'zh';
+let currentLang = 'en';
 
 // 存储键名
 const STORAGE_KEY = 'collected_data';
@@ -137,14 +137,21 @@ function isRecordComplete(record) {
 function renderRecords() {
     recordsList.innerHTML = records.map((record, index) => {
         const isComplete = isRecordComplete(record);
+        const missingFields = [];
+        
+        if (!record.age) missingFields.push('Age');
+        if (!record.gender) missingFields.push('Gender');
+        if (!record.type) missingFields.push('Type');
+        
         return `
             <div class="record-item ${!isComplete ? 'incomplete' : ''}">
                 <div>
-                    ${record.initial ? `Initial: ${record.initial} | ` : '<span class="missing">Initial missing</span> | '}
-                    ${record.age ? `Age: ${record.age} | ` : '<span class="missing">Age missing</span> | '}
-                    ${record.gender ? `Gender: ${record.gender === 'male' ? 'Male' : 'Female'} | ` : '<span class="missing">Gender missing</span> | '}
-                    ${record.type ? `Type: ${record.type}` : '<span class="missing">Type missing</span>'}
-                    ${record.timestamp ? `<br>保存时间: ${new Date(record.timestamp).toLocaleString()}` : ''}
+                    Initial: ${record.initial}
+                    ${record.age ? ` | Age: ${record.age}` : ''}
+                    ${record.gender ? ` | Gender: ${record.gender === 'male' ? 'Male' : 'Female'}` : ''}
+                    ${record.type ? ` | Type: ${record.type}` : ''}
+                    ${record.timestamp ? `<br>Saved at: ${new Date(record.timestamp).toLocaleString()}` : ''}
+                    ${missingFields.length > 0 ? `<br><span class="missing">Missing: ${missingFields.join(', ')}</span>` : ''}
                 </div>
                 <div class="record-actions">
                     <button class="edit-btn" onclick="window.location.href='edit.html?index=${index}'">Edit</button>
@@ -174,15 +181,15 @@ dataForm.addEventListener('submit', (e) => {
     
     const initial = document.getElementById('initial').value.trim();
     if (!initial) {
-        alert('必须填写Initial才能保存！');
+        alert('Initial is required!');
         return;
     }
     
     const formData = {
         initial: initial,
-        age: document.getElementById('age').value,
+        age: document.getElementById('age').value || '',
         gender: document.querySelector('input[name="gender"]:checked')?.value || '',
-        type: document.getElementById('type').value,
+        type: document.getElementById('type').value || '',
         timestamp: new Date().getTime()
     };
     
@@ -194,7 +201,7 @@ dataForm.addEventListener('submit', (e) => {
 
 // 删除记录
 function deleteRecord(index) {
-    if (confirm('确定要删除这条记录吗？')) {
+    if (confirm('Are you sure you want to delete this record?')) {
         records.splice(index, 1);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
         renderRecords();
@@ -204,14 +211,14 @@ function deleteRecord(index) {
 // 导出数据
 function exportData(date = new Date().toLocaleDateString()) {
     if (records.length === 0) {
-        alert('没有可导出的数据');
+        alert('No data to export');
         return;
     }
     
     // 检查是否所有记录都完整
     const incompleteRecords = records.filter(record => !isRecordComplete(record));
     if (incompleteRecords.length > 0) {
-        alert('还有未完成的记录，请先完成所有记录再导出！');
+        alert('Please complete all records before exporting!');
         return;
     }
     
