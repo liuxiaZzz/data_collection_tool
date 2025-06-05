@@ -220,4 +220,20 @@ h2 {
     background-color: #fff3cd;
     padding: 2px 4px;
     border-radius: 3px;
+}
+
+.guide-link {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.guide-link:hover {
+    background-color: #2980b9;
 } 

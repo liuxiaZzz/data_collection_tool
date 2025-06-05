@@ -34,62 +34,111 @@
             border-radius: 8px;
             margin: 10px 0;
         }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .back-button:hover {
+            background-color: #2980b9;
+        }
     </style>
 </head>
 <body>
-    <h1>如何在iPad上使用数据收集应用</h1>
+    <a href="index.html" class="back-button">← Back to App</a>
+    <h1>How to Use the Data Collection App</h1>
 
     <div class="step">
-        <h2>第一步：访问应用</h2>
-        <p>1. 在iPad上打开Safari浏览器</p>
-        <p>2. 访问应用网址：<br>
-           • 如果使用GitHub Pages：https://[用户名].github.io/[仓库名]<br>
-           • 如果使用本地服务器：http://[电脑IP地址]:8000</p>
-    </div>
-
-    <div class="step">
-        <h2>第二步：添加到主屏幕</h2>
-        <p>1. 点击Safari底部的分享按钮 <span style="font-size: 1.2em">⬆️</span></p>
-        <p>2. 在弹出的菜单中滚动找到并点击"添加到主屏幕"选项</p>
-        <p>3. 在弹出的对话框中点击"添加"</p>
-    </div>
-
-    <div class="step">
-        <h2>第三步：使用应用</h2>
-        <p>1. 返回iPad主屏幕，你会看到应用图标</p>
-        <p>2. 点击图标启动应用</p>
-        <p>3. 应用会全屏打开，像原生应用一样运行</p>
-    </div>
-
-    <div class="note">
-        <h3>重要提示：</h3>
+        <h2>Step 1: Installation</h2>
+        <p>1. Open Safari on your iPad</p>
+        <p>2. Add the app to your home screen for the best experience:</p>
         <ul>
-            <li>应用支持完全离线使用</li>
-            <li>所有数据都保存在本地，不会丢失</li>
-            <li>定期导出数据以备份</li>
-            <li>如果有网络连接，应用会自动检查更新</li>
+            <li>Tap the share button at the bottom of Safari</li>
+            <li>Scroll and tap "Add to Home Screen"</li>
+            <li>Tap "Add" in the popup dialog</li>
         </ul>
     </div>
 
     <div class="step">
-        <h2>常见问题解决：</h2>
-        <p><strong>问题1：找不到"添加到主屏幕"选项？</strong><br>
-        确保使用Safari浏览器，其他浏览器可能不支持此功能。</p>
+        <h2>Step 2: Basic Usage</h2>
+        <p><strong>Adding New Records:</strong></p>
+        <ul>
+            <li>Initial is required, other fields can be filled later</li>
+            <li>Enter the patient's initial</li>
+            <li>Optionally fill in age, gender, and type</li>
+            <li>Click "Save" to store the record</li>
+        </ul>
+    </div>
+
+    <div class="step">
+        <h2>Step 3: Managing Records</h2>
+        <p><strong>Searching Records:</strong></p>
+        <ul>
+            <li>Use the search box above the records list</li>
+            <li>Type the patient's initial to filter records</li>
+            <li>Matching text will be highlighted</li>
+        </ul>
         
-        <p><strong>问题2：无法打开应用？</strong><br>
-        检查网络连接，如果是本地服务器，确保iPad和电脑在同一网络下。</p>
+        <p><strong>Editing Records:</strong></p>
+        <ul>
+            <li>Click "Edit" on any record to modify it</li>
+            <li>Initial cannot be changed once saved</li>
+            <li>Other fields can be updated at any time</li>
+        </ul>
         
-        <p><strong>问题3：数据没有保存？</strong><br>
-        确保没有使用Safari的无痕浏览模式。</p>
+        <p><strong>Incomplete Records:</strong></p>
+        <ul>
+            <li>Records with missing fields are highlighted in red</li>
+            <li>Missing fields are listed below each record</li>
+            <li>All fields must be completed before exporting</li>
+        </ul>
+    </div>
+
+    <div class="step">
+        <h2>Step 4: Exporting Data</h2>
+        <ul>
+            <li>Click "Export Data" to download records as CSV</li>
+            <li>All records must be complete before exporting</li>
+            <li>Export includes: Initial, Age, Gender, Type, and Timestamp</li>
+            <li>Regular exports are recommended for backup</li>
+        </ul>
     </div>
 
     <div class="note">
-        <h3>技术支持：</h3>
-        <p>如果遇到问题，请检查：</p>
+        <h3>Important Notes:</h3>
         <ul>
-            <li>Safari版本是否最新</li>
-            <li>是否允许了必要的权限</li>
-            <li>设备存储空间是否充足</li>
+            <li>The app works completely offline</li>
+            <li>All data is stored locally on your device</li>
+            <li>Regular data exports are recommended for backup</li>
+            <li>The app will automatically update when online</li>
+        </ul>
+    </div>
+
+    <div class="step">
+        <h2>Troubleshooting:</h2>
+        <p><strong>Issue 1: Can't find "Add to Home Screen"?</strong><br>
+        Make sure you're using Safari browser, as other browsers may not support this feature.</p>
+        
+        <p><strong>Issue 2: App not working offline?</strong><br>
+        Ensure you've opened the app at least once while online to cache all necessary files.</p>
+        
+        <p><strong>Issue 3: Data not saving?</strong><br>
+        Make sure you're not using Safari's private browsing mode and have sufficient storage space.</p>
+    </div>
+
+    <div class="note">
+        <h3>Technical Support:</h3>
+        <p>If you encounter issues, please check:</p>
+        <ul>
+            <li>Safari is updated to the latest version</li>
+            <li>Necessary permissions are granted</li>
+            <li>Sufficient device storage is available</li>
+            <li>You're not in private browsing mode</li>
+            <li>If the problem persists, please contact the developer Shibo: <a href="mailto:e1124313@u.nus.edu">e1124313@u.nus.edu</a></li>
         </ul>
     </div>
 </body>
