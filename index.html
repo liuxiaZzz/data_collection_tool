@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Collection</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Data Collection">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <meta name="theme-color" content="#2c3e50">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Data Collection</h1>
+        </div>
+        <form id="dataForm">
+            <div class="form-group">
+                <label for="initial">Initial:</label>
+                <input type="text" id="initial" maxlength="10">
+            </div>
+            
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" required min="0" max="150">
+            </div>
+            
+            <div class="form-group">
+                <label>Gender:</label>
+                <div class="radio-group">
+                    <input type="radio" id="male" name="gender" value="male" required>
+                    <label for="male">Male</label>
+                    <input type="radio" id="female" name="gender" value="female">
+                    <label for="female">Female</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="type">Type:</label>
+                <select id="type" required>
+                    <option value="">Select Type</option>
+                    <option value="type1">Type 1</option>
+                    <option value="type2">Type 2</option>
+                    <option value="type3">Type 3</option>
+                    <option value="type4">Type 4</option>
+                    <option value="type5">Type 5</option>
+                    <option value="type6">Type 6</option>
+                    <option value="type7">Type 7</option>
+                    <option value="type8">Type 8</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit">Save</button>
+                <button type="button" id="exportBtn">Export Data</button>
+            </div>
+        </form>
+        
+        <div class="records">
+            <h2>Saved Records</h2>
+            <div id="recordsList"></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html> 

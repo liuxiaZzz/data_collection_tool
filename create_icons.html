@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate PWA Icons</title>
+    <style>
+        canvas {
+            border: 1px solid #ddd;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="icon192" width="192" height="192"></canvas>
+    <canvas id="icon512" width="512" height="512"></canvas>
+    <script>
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            
+            // 背景
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillRect(0, 0, size, size);
+            
+            // 圆形装饰
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size*0.4, 0, Math.PI * 2);
+            ctx.fillStyle = '#3498db';
+            ctx.fill();
+            
+            // 文字
+            ctx.fillStyle = '#fff';
+            ctx.font = `bold ${size*0.2}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('DC', size/2, size/2);
+            
+            // 下载链接
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // 生成两种尺寸的图标
+        drawIcon(document.getElementById('icon192'), 192);
+        drawIcon(document.getElementById('icon512'), 512);
+    </script>
+</body>
+</html> 
