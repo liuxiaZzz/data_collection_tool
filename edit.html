@@ -14,48 +14,57 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Edit Record</h1>
-        </div>
+        <h1>Edit Record</h1>
         <form id="editForm">
             <div class="form-group">
                 <label for="initial">Initial:</label>
-                <input type="text" id="initial" maxlength="10" disabled>
+                <input type="text" id="initial" required>
             </div>
             
             <div class="form-group">
-                <label for="age">Age:</label>
-                <input type="number" id="age" min="0" max="150">
+                <label for="ageGroup" data-lang="ageGroup">Age Group:</label>
+                <select id="ageGroup">
+                    <option value="" data-lang="selectAgeGroup">Select Age Group</option>
+                    <option value="0-10" data-lang="ageGroup1">0-10 years</option>
+                    <option value="11-20" data-lang="ageGroup2">11-20 years</option>
+                    <option value="21-30" data-lang="ageGroup3">21-30 years</option>
+                    <option value="31-40" data-lang="ageGroup4">31-40 years</option>
+                    <option value="41-50" data-lang="ageGroup5">41-50 years</option>
+                    <option value="51-60" data-lang="ageGroup6">51-60 years</option>
+                    <option value="61-70" data-lang="ageGroup7">61-70 years</option>
+                    <option value="71-80" data-lang="ageGroup8">71-80 years</option>
+                    <option value=">80" data-lang="ageGroup9">Above 80 years</option>
+                </select>
             </div>
             
             <div class="form-group">
-                <label>Gender:</label>
+                <label data-lang="gender">Gender:</label>
                 <div class="radio-group">
                     <input type="radio" id="male" name="gender" value="male">
-                    <label for="male">Male</label>
+                    <label for="male" data-lang="male">Male</label>
                     <input type="radio" id="female" name="gender" value="female">
-                    <label for="female">Female</label>
+                    <label for="female" data-lang="female">Female</label>
                 </div>
             </div>
             
             <div class="form-group">
-                <label for="type">Type:</label>
+                <label for="type" data-lang="type">Type:</label>
                 <select id="type">
-                    <option value="">Select Type</option>
-                    <option value="type1">Type 1</option>
-                    <option value="type2">Type 2</option>
-                    <option value="type3">Type 3</option>
-                    <option value="type4">Type 4</option>
-                    <option value="type5">Type 5</option>
-                    <option value="type6">Type 6</option>
-                    <option value="type7">Type 7</option>
-                    <option value="type8">Type 8</option>
+                    <option value="" data-lang="selectType">Select Type</option>
+                    <option value="type1" data-lang="type1">Type 1</option>
+                    <option value="type2" data-lang="type2">Type 2</option>
+                    <option value="type3" data-lang="type3">Type 3</option>
+                    <option value="type4" data-lang="type4">Type 4</option>
+                    <option value="type5" data-lang="type5">Type 5</option>
+                    <option value="type6" data-lang="type6">Type 6</option>
+                    <option value="type7" data-lang="type7">Type 7</option>
+                    <option value="type8" data-lang="type8">Type 8</option>
                 </select>
             </div>
             
-            <div class="button-group">
-                <button type="submit">Update</button>
-                <button type="button" id="cancelBtn">Cancel</button>
+            <div class="form-actions">
+                <button type="submit" class="save-btn">Save Changes</button>
+                <button type="button" class="cancel-btn" onclick="window.history.back()">Cancel</button>
             </div>
         </form>
     </div>
