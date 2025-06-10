@@ -150,7 +150,10 @@ function showAutoSaveStatus() {
 function updateLanguage() {
     document.querySelectorAll('[data-lang]').forEach(element => {
         const key = element.getAttribute('data-lang');
-        if (element.tagName === 'INPUT' || element.tagName === 'OPTION') {
+        if (element.tagName === 'OPTION') {
+            // 只更新选项的显示文本，不更新value值
+            element.textContent = translations[currentLang][key] || '';
+        } else if (element.tagName === 'INPUT') {
             element.value = translations[currentLang][key] || '';
         } else {
             element.textContent = translations[currentLang][key] || '';
@@ -169,14 +172,11 @@ function isRecordComplete(record) {
 
 // 处理表单数据，统一处理未填写的值
 function processFormData(formElement) {
-    const ageGroup = formElement.querySelector('#ageGroup').value;
-    const diseaseType = formElement.querySelector('#diseaseType').value;
-    
     return {
         initial: formElement.querySelector('#initial').value.trim(),
-        ageGroup: ageGroup === 'Select Age Group' ? '' : ageGroup,
+        ageGroup: formElement.querySelector('#ageGroup').value || '',
         gender: formElement.querySelector('input[name="gender"]:checked')?.value || '',
-        diseaseType: diseaseType === 'Select Disease Type' ? '' : diseaseType
+        diseaseType: formElement.querySelector('#diseaseType').value || ''
     };
 }
 

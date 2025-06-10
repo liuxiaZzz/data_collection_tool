@@ -107,7 +107,7 @@ async function populateForm() {
         
         // 处理年龄组选择
         const ageGroup = record.ageGroup;
-        document.getElementById('ageGroup').value = (ageGroup && ageGroup !== 'Select Age Group') ? ageGroup : '';
+        document.getElementById('ageGroup').value = ageGroup || '';
         
         // 处理性别选择
         if (record.gender) {
@@ -116,7 +116,7 @@ async function populateForm() {
         
         // 处理疾病类型选择
         const diseaseType = record.diseaseType;
-        document.getElementById('diseaseType').value = (diseaseType && diseaseType !== 'Select Disease Type') ? diseaseType : '';
+        document.getElementById('diseaseType').value = diseaseType || '';
     } catch (error) {
         console.error('加载记录失败', error);
         alert('Failed to load record');
@@ -126,14 +126,11 @@ async function populateForm() {
 
 // 处理表单数据，统一处理未填写的值
 function processFormData(formElement) {
-    const ageGroup = formElement.querySelector('#ageGroup').value;
-    const diseaseType = formElement.querySelector('#diseaseType').value;
-    
     return {
         initial: formElement.querySelector('#initial').value.trim(),
-        ageGroup: ageGroup === 'Select Age Group' ? '' : ageGroup,
+        ageGroup: formElement.querySelector('#ageGroup').value || '',
         gender: formElement.querySelector('input[name="gender"]:checked')?.value || '',
-        diseaseType: diseaseType === 'Select Disease Type' ? '' : diseaseType
+        diseaseType: formElement.querySelector('#diseaseType').value || ''
     };
 }
 
