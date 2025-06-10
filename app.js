@@ -98,11 +98,14 @@ let currentLang = 'en';
 // 存储键名
 const STORAGE_KEY = 'collected_data';
 const LAST_SAVE_DATE_KEY = 'last_save_date';
+const LAST_AUTO_BACKUP_DATE_KEY = 'last_auto_backup_date'; // 新增：记录最后自动备份日期
 
 // 数据库配置
 const DB_NAME = 'clinicalResearchDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'records';
+const MAX_BACKUP_COUNT = 7; // 最多保存7次备份
+const AUTO_BACKUP_CHECK_INTERVAL = 5 * 60 * 1000; // 5分钟检查一次备份状态
 
 // 存储状态指示器
 const BACKUP_INTERVAL = 24 * 60 * 60 * 1000; // 24小时
@@ -324,6 +327,10 @@ function initDB() {
                 const store = db.createObjectStore(STORE_NAME, { keyPath: 'timestamp' });
                 store.createIndex('initial', 'initial', { unique: false });
                 store.createIndex('timestamp', 'timestamp', { unique: true });
+            }
+            // 添加自动备份存储
+            if (!db.objectStoreNames.contains('autoBackups')) {
+                db.createObjectStore('autoBackups', { keyPath: 'id' });
             }
         };
     });
@@ -673,13 +680,149 @@ async function deleteRecord(timestamp) {
     }
 }
 
+// 备份数据到IndexedDB
+async function saveBackupToIndexedDB(backupData, isAutoBackup = false) {
+    const dateStr = new Date().toISOString().split('T')[0];
+    const fileName = `clinical_research_${isAutoBackup ? 'auto_' : ''}backup_${dateStr}.json`;
+    
+    try {
+        const db = await initDB();
+        const transaction = db.transaction(['autoBackups'], 'readwrite');
+        const store = transaction.objectStore('autoBackups');
+        
+        await new Promise((resolve, reject) => {
+            const request = store.put({
+                id: dateStr,
+                fileName: fileName,
+                data: backupData,
+                timestamp: new Date().getTime(),
+                isAutoBackup: isAutoBackup
+            });
+            
+            request.onsuccess = resolve;
+            request.onerror = () => reject(request.error);
+        });
+
+        // 更新最后备份时间
+        localStorage.setItem(LAST_BACKUP_KEY, Date.now().toString());
+        if (isAutoBackup) {
+            localStorage.setItem(LAST_AUTO_BACKUP_DATE_KEY, new Date().toISOString());
+        }
+        await updateStorageStatus();
+        
+        return fileName;
+    } catch (error) {
+        console.error('Failed to save backup to IndexedDB', error);
+        throw error;
+    }
+}
+
+// 检查自动备份状态
+async function checkAutoBackupStatus() {
+    try {
+        const db = await initDB();
+        const transaction = db.transaction(['autoBackups'], 'readonly');
+        const store = transaction.objectStore('autoBackups');
+        const backups = await new Promise((resolve, reject) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        // 检查最近的备份是否成功
+        const lastBackup = backups.sort((a, b) => b.timestamp - a.timestamp)[0];
+        const now = new Date().getTime();
+        
+        // 只有在以下情况显示警告：
+        // 1. 有数据需要备份
+        // 2. 上次备份时间超过间隔
+        // 3. 不是首次使用（已经有过备份记录）
+        const records = await loadRecords();
+        if (records.length > 0 && lastBackup && (now - lastBackup.timestamp) > BACKUP_INTERVAL) {
+            showToast('Warning: Automatic backup may not be working properly', true, 10000);
+            console.warn('Automatic backup status abnormal: Backup expired');
+        }
+
+        // 清理旧备份
+        if (backups.length > MAX_BACKUP_COUNT) {
+            await cleanOldBackups(backups);
+        }
+
+        return {
+            lastBackupTime: lastBackup ? new Date(lastBackup.timestamp) : null,
+            backupCount: backups.length,
+            status: !records.length || !lastBackup || (now - lastBackup.timestamp) <= BACKUP_INTERVAL ? 'Normal' : 'Attention Required'
+        };
+    } catch (error) {
+        console.error('Failed to check auto backup status', error);
+        return null;
+    }
+}
+
+// 自动备份数据
+async function autoBackupData() {
+    const records = await loadRecords();
+    if (records.length === 0) {
+        return; // 如果没有数据，不进行备份
+    }
+
+    const backupData = {
+        version: '1.0',
+        timestamp: new Date().getTime(),
+        records: records
+    };
+    
+    try {
+        await saveBackupToIndexedDB(backupData, true);
+    } catch (error) {
+        console.error('Auto backup failed', error);
+        showToast('Auto backup failed, please backup manually', true);
+    }
+}
+
+// 手动备份数据
+async function backupData() {
+    try {
+        const records = await loadRecords();
+        if (records.length === 0) {
+            showToast('No data to backup', true);
+            return;
+        }
+
+        const backupData = {
+            version: '1.0',
+            timestamp: new Date().getTime(),
+            records: records
+        };
+        
+        // 先保存到IndexedDB
+        const fileName = await saveBackupToIndexedDB(backupData, false);
+        
+        // 然后创建下载文件
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        showToast('Data backup successful!');
+    } catch (error) {
+        console.error('Backup failed', error);
+        showToast('Backup failed, please try again', true);
+    }
+}
+
 // 更新存储状态显示
 async function updateStorageStatus() {
     try {
         const records = await loadRecords();
         const storageType = await checkStorageType();
-        const lastBackup = localStorage.getItem(LAST_BACKUP_KEY);
-        const lastBackupDate = lastBackup ? new Date(parseInt(lastBackup)) : null;
+        const backupStatus = await checkAutoBackupStatus();
         
         const statusDiv = document.getElementById('storageStatus');
         statusDiv.innerHTML = `
@@ -692,29 +835,60 @@ async function updateStorageStatus() {
                     <i class="fas fa-file-medical"></i>
                     Total Records: ${records.length}
                 </div>
-                ${lastBackupDate ? `
+                ${backupStatus ? `
+                <div class="backup-status ${backupStatus.status === 'Normal' ? 'normal' : 'warning'}">
+                    <i class="fas fa-shield-alt"></i>
+                    Backup Status: ${backupStatus.status}
+                </div>
+                <div class="backup-info">
+                    <i class="fas fa-history"></i>
+                    Saved Backups: ${backupStatus.backupCount}/${MAX_BACKUP_COUNT}
+                </div>
+                ${backupStatus.lastBackupTime ? `
                 <div class="last-backup">
                     <i class="fas fa-clock"></i>
-                    Last Backup: ${lastBackupDate.toLocaleString()}
+                    Last Backup: ${backupStatus.lastBackupTime.toLocaleString()}
                 </div>` : ''}
+                ` : ''}
             </div>
             <div class="backup-actions">
                 <button id="backupBtn" class="backup-btn" onclick="backupData()">
                     <i class="fas fa-download"></i>
                     Backup Data
                 </button>
-                <button id="restoreBtn" class="restore-btn" onclick="document.getElementById('restoreFile').click()">
+                <button id="restoreBtn" class="restore-btn" onclick="showRestoreDialog()">
                     <i class="fas fa-upload"></i>
                     Restore Data
                 </button>
-                <input type="file" id="restoreFile" accept=".json" style="display: none" onchange="restoreData(event)">
+                <input type="file" id="restoreFile" accept=".json" style="display: none" onchange="restoreFromFile(event)">
             </div>
         `;
-        
-        // 检查是否需要备份提醒
-        if (lastBackupDate && Date.now() - lastBackupDate.getTime() > BACKUP_INTERVAL) {
-            showToast('It is recommended to backup your data', false, 10000);
-        }
+
+        // 添加新的样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .backup-status {
+                padding: 5px 10px;
+                border-radius: 4px;
+                margin: 5px 0;
+            }
+            .backup-status.normal {
+                background-color: #e8f5e9;
+                color: #2e7d32;
+            }
+            .backup-status.warning {
+                background-color: #fff3e0;
+                color: #ef6c00;
+            }
+            .backup-info {
+                margin: 5px 0;
+                color: #666;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 定期检查备份状态
+        setInterval(checkAutoBackupStatus, AUTO_BACKUP_CHECK_INTERVAL);
     } catch (error) {
         console.error('Failed to update storage status', error);
     }
@@ -730,41 +904,239 @@ async function checkStorageType() {
     }
 }
 
-// 备份数据
-async function backupData() {
+// 显示恢复对话框
+async function showRestoreDialog() {
     try {
-        const records = await loadRecords();
-        const backupData = {
-            version: '1.0',
-            timestamp: new Date().getTime(),
-            records: records
-        };
-        
-        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        const dateStr = new Date().toISOString().split('T')[0];
-        
-        link.href = url;
-        link.download = `clinical_research_backup_${dateStr}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        
-        // 更新最后备份时间
-        localStorage.setItem(LAST_BACKUP_KEY, Date.now().toString());
-        updateStorageStatus();
-        
-        showToast('Data backup successful!');
+        const db = await initDB();
+        const transaction = db.transaction(['autoBackups'], 'readonly');
+        const store = transaction.objectStore('autoBackups');
+        const backups = await new Promise((resolve, reject) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        // 按时间排序，最新的在前
+        backups.sort((a, b) => b.timestamp - a.timestamp);
+
+        const dialog = document.createElement('div');
+        dialog.className = 'export-dialog';
+        dialog.innerHTML = `
+            <div class="export-dialog-content card">
+                <div class="dialog-header">
+                    <h2>
+                        <i class="fas fa-upload"></i>
+                        Restore Data
+                    </h2>
+                </div>
+                <div class="dialog-body">
+                    <div class="restore-options">
+                        <h3>Available Backups</h3>
+                        <div class="backup-list">
+                            ${backups.map((backup, index) => `
+                                <div class="backup-item">
+                                    <div class="backup-info">
+                                        <span class="backup-date">
+                                            <i class="fas ${backup.isAutoBackup ? 'fa-clock' : 'fa-user'}"></i>
+                                            ${new Date(backup.timestamp).toLocaleString()}
+                                        </span>
+                                        <span class="backup-type">${backup.isAutoBackup ? 'Auto Backup' : 'Manual Backup'}</span>
+                                    </div>
+                                    <button onclick="restoreFromBackup('${backup.id}')" class="restore-btn">
+                                        <i class="fas fa-undo"></i>
+                                        Restore
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="restore-divider">
+                            <span>OR</span>
+                        </div>
+                        <div class="file-restore-section">
+                            <h3>Restore from File</h3>
+                            <button onclick="document.getElementById('restoreFile').click()" class="choose-file-btn">
+                                <i class="fas fa-file-upload"></i>
+                                Choose Backup File
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="dialog-buttons">
+                    <button id="cancelRestore" class="cancel-btn" onclick="this.closest('.export-dialog').remove()">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // 添加样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .backup-list {
+                max-height: 300px;
+                overflow-y: auto;
+                margin: 10px 0;
+            }
+            .backup-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px;
+                border-bottom: 1px solid #eee;
+            }
+            .backup-info {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            .backup-date {
+                font-weight: bold;
+            }
+            .backup-type {
+                font-size: 0.9em;
+                color: #666;
+            }
+            .restore-divider {
+                text-align: center;
+                margin: 20px 0;
+                position: relative;
+            }
+            .restore-divider::before,
+            .restore-divider::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                width: 45%;
+                height: 1px;
+                background: #ddd;
+            }
+            .restore-divider::before {
+                left: 0;
+            }
+            .restore-divider::after {
+                right: 0;
+            }
+            .restore-divider span {
+                background: white;
+                padding: 0 10px;
+                color: #666;
+            }
+            .file-restore-section {
+                text-align: center;
+                padding: 20px 0;
+            }
+            .restore-btn {
+                padding: 6px 12px;
+                border: none;
+                border-radius: 8px;
+                background-color: #1e88e5;
+                color: white;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                min-width: 90px;
+                justify-content: center;
+            }
+            .restore-btn:hover {
+                background-color: #1565c0;
+            }
+            .choose-file-btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                background-color: #7cb342;
+                color: white;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 1em;
+                min-width: 200px;
+                justify-content: center;
+            }
+            .choose-file-btn:hover {
+                background-color: #689f38;
+            }
+            .cancel-btn {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 8px;
+                background-color: #f44336;
+                color: white;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                min-width: 90px;
+                justify-content: center;
+            }
+            .cancel-btn:hover {
+                background-color: #d32f2f;
+            }
+            .dialog-buttons {
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 20px;
+            }
+            .export-dialog-content {
+                border-radius: 12px;
+            }
+            button i {
+                font-size: 0.9em;
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.body.appendChild(dialog);
+
+        // 点击背景关闭对话框
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                document.body.removeChild(dialog);
+            }
+        });
     } catch (error) {
-        console.error('Backup failed', error);
-        showToast('Backup failed, please try again', true);
+        console.error('Failed to show restore dialog', error);
+        showToast('Failed to load backup history', true);
     }
 }
 
-// 恢复数据
-async function restoreData(event) {
+// 从备份恢复
+async function restoreFromBackup(backupId) {
+    try {
+        const db = await initDB();
+        const transaction = db.transaction(['autoBackups'], 'readonly');
+        const store = transaction.objectStore('autoBackups');
+        const backup = await new Promise((resolve, reject) => {
+            const request = store.get(backupId);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        if (!backup || !backup.data) {
+            throw new Error('Invalid backup data');
+        }
+
+        if (!confirm('This will replace all current data with the backup data. Are you sure you want to continue?')) {
+            return;
+        }
+
+        await restoreData(backup.data);
+        document.querySelector('.export-dialog')?.remove();
+        showToast('Data restored successfully!');
+    } catch (error) {
+        console.error('Failed to restore from backup:', error);
+        showToast('Failed to restore data', true);
+    }
+}
+
+// 从文件恢复
+async function restoreFromFile(event) {
     try {
         const file = event.target.files[0];
         if (!file) {
@@ -775,42 +1147,9 @@ async function restoreData(event) {
         reader.onload = async (e) => {
             try {
                 const backupData = JSON.parse(e.target.result);
-                
-                // 验证备份文件格式
-                if (!backupData.version || !backupData.timestamp || !Array.isArray(backupData.records)) {
-                    throw new Error('Invalid backup file format');
-                }
-
-                // 确认恢复操作
-                if (!confirm('This will replace all current data with the backup data. Are you sure you want to continue?')) {
-                    return;
-                }
-
-                // 清除现有数据
-                const db = await initDB();
-                const transaction = db.transaction([STORE_NAME], 'readwrite');
-                const store = transaction.objectStore(STORE_NAME);
-                await new Promise((resolve, reject) => {
-                    const request = store.clear();
-                    request.onsuccess = resolve;
-                    request.onerror = () => reject(request.error);
-                });
-
-                // 恢复备份数据
-                for (const record of backupData.records) {
-                    await new Promise((resolve, reject) => {
-                        const request = store.add(record);
-                        request.onsuccess = resolve;
-                        request.onerror = () => reject(request.error);
-                    });
-                }
-
-                // 更新界面
-                const records = await loadRecords();
-                renderRecords(records);
-                updateStorageStatus();
-                
-                showToast(`Successfully restored ${backupData.records.length} records`);
+                await restoreData(backupData);
+                document.querySelector('.export-dialog')?.remove();
+                showToast('Data restored successfully!');
             } catch (error) {
                 console.error('Failed to restore data:', error);
                 showToast('Failed to restore data: Invalid backup file', true);
@@ -827,15 +1166,91 @@ async function restoreData(event) {
     }
 }
 
+// 恢复数据的核心逻辑
+async function restoreData(backupData) {
+    // 验证备份文件格式
+    if (!backupData.version || !backupData.timestamp || !Array.isArray(backupData.records)) {
+        throw new Error('Invalid backup file format');
+    }
+
+    // 清除现有数据
+    const db = await initDB();
+    const transaction = db.transaction([STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    await new Promise((resolve, reject) => {
+        const request = store.clear();
+        request.onsuccess = resolve;
+        request.onerror = () => reject(request.error);
+    });
+
+    // 恢复备份数据
+    for (const record of backupData.records) {
+        await new Promise((resolve, reject) => {
+            const request = store.add(record);
+            request.onsuccess = resolve;
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    // 更新界面
+    const records = await loadRecords();
+    renderRecords(records);
+    updateStorageStatus();
+}
+
+// 检查是否需要自动备份
+async function checkAutoBackup() {
+    const lastAutoBackup = localStorage.getItem(LAST_AUTO_BACKUP_DATE_KEY);
+    const today = new Date().toLocaleDateString();
+    
+    if (!lastAutoBackup || new Date(lastAutoBackup).toLocaleDateString() !== today) {
+        try {
+            await autoBackupData();
+            localStorage.setItem(LAST_AUTO_BACKUP_DATE_KEY, new Date().toISOString());
+            showToast('数据已自动备份');
+        } catch (error) {
+            console.error('自动备份失败', error);
+            showToast('自动备份失败，请手动备份数据', true);
+        }
+    }
+}
+
+// 清理旧备份
+async function cleanOldBackups(backups) {
+    try {
+        const db = await initDB();
+        const transaction = db.transaction(['autoBackups'], 'readwrite');
+        const store = transaction.objectStore('autoBackups');
+
+        // 按时间排序，保留最新的MAX_BACKUP_COUNT个备份
+        const backupsToDelete = backups
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .slice(MAX_BACKUP_COUNT);
+
+        for (const backup of backupsToDelete) {
+            await new Promise((resolve, reject) => {
+                const request = store.delete(backup.id);
+                request.onsuccess = resolve;
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        console.log(`Cleaned up ${backupsToDelete.length} old backups`);
+    } catch (error) {
+        console.error('Failed to clean up old backups', error);
+    }
+}
+
 // 修改初始化函数
 async function init() {
     try {
-    updateLanguage();
+        updateLanguage();
         const records = await loadRecords();
         renderRecords(records);
-    setupAutoSave();
-    restoreFormState();
+        setupAutoSave();
+        restoreFormState();
         await updateStorageStatus();
+        await checkAutoBackup(); // 检查是否需要自动备份
 
         // 显示数据统计
         const stats = await getDataStats();
