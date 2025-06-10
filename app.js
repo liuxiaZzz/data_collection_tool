@@ -256,7 +256,7 @@ async function renderRecords(recordsToRender = null, searchTerm = '') {
                     <div class="detail-row">
                             <span class="detail-label">${translations[currentLang].diseaseType}:</span>
                             <span class="detail-value">${displayDiseaseType}</span>
-                        </div>
+                    </div>
                 </div>
                 <div class="record-actions">
                     <button class="toggle-details-btn" onclick="toggleDetails(${index})" data-index="${index}">
@@ -264,7 +264,7 @@ async function renderRecords(recordsToRender = null, searchTerm = '') {
                     </button>
                         <button class="edit-btn" onclick="window.location.href='edit.html?timestamp=${record.timestamp}'">${translations[currentLang].edit}</button>
                         <button class="delete-btn" onclick="deleteRecord(${record.timestamp})">${translations[currentLang].delete}</button>
-                    </div>
+                </div>
             </div>
         `;
     }).join('');
@@ -631,8 +631,12 @@ dataForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const initial = document.getElementById('initial').value.trim();
+    const ageGroup = document.getElementById('ageGroup').value;
+    const diseaseType = document.getElementById('diseaseType').value;
+    
+    // 统一验证逻辑
     if (!initial) {
-        alert('Initial is required!');
+        showToast('Initial is required!', true);
         return;
     }
     
