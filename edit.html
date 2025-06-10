@@ -3,59 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Record</title>
+    <title>Edit Record - Clinical Research Database</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Data Collection">
+    <meta name="apple-mobile-web-app-title" content="Clinical Research Database">
     <link rel="apple-touch-icon" href="icon-192x192.png">
-    <meta name="theme-color" content="#2c3e50">
+    <meta name="theme-color" content="#3498db">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Edit Record</h1>
-        </div>
+        <h1>Edit Record</h1>
         <form id="editForm">
             <div class="form-group">
-                <label for="initial">Initial:</label>
-                <input type="text" id="initial" maxlength="10" disabled>
+                <label for="initial">
+                    <i class="fas fa-user"></i>
+                    <span>Participant initial:</span>
+                </label>
+                <input type="text" id="initial" required>
             </div>
             
             <div class="form-group">
-                <label for="age">Age:</label>
-                <input type="number" id="age" min="0" max="150">
+                <label for="ageGroup">
+                    <i class="fas fa-birthday-cake"></i>
+                    <span data-lang="ageGroup">Age Group:</span>
+                </label>
+                <select id="ageGroup">
+                    <option value="" data-lang="selectAgeGroup">Select Age Group</option>
+                    <option value="0-10" data-lang="ageGroup1">0-10 years</option>
+                    <option value="11-20" data-lang="ageGroup2">11-20 years</option>
+                    <option value="21-30" data-lang="ageGroup3">21-30 years</option>
+                    <option value="31-40" data-lang="ageGroup4">31-40 years</option>
+                    <option value="41-50" data-lang="ageGroup5">41-50 years</option>
+                    <option value="51-60" data-lang="ageGroup6">51-60 years</option>
+                    <option value="61-70" data-lang="ageGroup7">61-70 years</option>
+                    <option value="71-80" data-lang="ageGroup8">71-80 years</option>
+                    <option value=">80" data-lang="ageGroup9">Above 80 years</option>
+                </select>
             </div>
             
             <div class="form-group">
-                <label>Gender:</label>
+                <label>
+                    <i class="fas fa-venus-mars"></i>
+                    <span data-lang="gender">Gender:</span>
+                </label>
                 <div class="radio-group">
-                    <input type="radio" id="male" name="gender" value="male">
-                    <label for="male">Male</label>
-                    <input type="radio" id="female" name="gender" value="female">
-                    <label for="female">Female</label>
+                    <label class="radio-label">
+                        <input type="radio" id="male" name="gender" value="male">
+                        <span data-lang="male">Male</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" id="female" name="gender" value="female">
+                        <span data-lang="female">Female</span>
+                    </label>
                 </div>
             </div>
             
             <div class="form-group">
-                <label for="type">Type:</label>
-                <select id="type">
-                    <option value="">Select Type</option>
-                    <option value="type1">Type 1</option>
-                    <option value="type2">Type 2</option>
-                    <option value="type3">Type 3</option>
-                    <option value="type4">Type 4</option>
-                    <option value="type5">Type 5</option>
-                    <option value="type6">Type 6</option>
-                    <option value="type7">Type 7</option>
-                    <option value="type8">Type 8</option>
+                <label for="diseaseType">
+                    <i class="fas fa-stethoscope"></i>
+                    <span data-lang="diseaseType">Disease Type:</span>
+                </label>
+                <select id="diseaseType">
+                    <option value="" data-lang="selectDiseaseType">Select Disease Type</option>
+                    <option value="aom" data-lang="disease1">Acute Otitis Media</option>
+                    <option value="cholesteatoma" data-lang="disease2">Cholesteatoma of middle ear</option>
+                    <option value="csom" data-lang="disease3">Chronic suppurative otitis media</option>
+                    <option value="eacb" data-lang="disease4">External auditory canal bleeding</option>
+                    <option value="impacted_cerumen" data-lang="disease5">Impacted cerumen</option>
+                    <option value="normal" data-lang="disease6">Normal</option>
+                    <option value="otomycosis" data-lang="disease7">Otomycosis external</option>
+                    <option value="som" data-lang="disease8">Secretory otitis media</option>
+                    <option value="tmc" data-lang="disease9">Tympanic membrane calcification</option>
                 </select>
             </div>
             
-            <div class="button-group">
-                <button type="submit">Update</button>
-                <button type="button" id="cancelBtn">Cancel</button>
+            <div class="form-actions">
+                <button type="submit" class="save-btn">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+                <button type="button" class="cancel-btn" onclick="window.history.back()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
             </div>
         </form>
     </div>

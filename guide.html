@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Collection App Guide</title>
+    <title>Research Data Management Guide</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -11,16 +11,25 @@
             margin: 0 auto;
             padding: 20px;
             line-height: 1.6;
+            color: #2c3e50;
         }
         .step {
             margin-bottom: 30px;
             padding: 20px;
-            background: #f5f5f5;
-            border-radius: 8px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         .step h2 {
             margin-top: 0;
-            color: #2c3e50;
+            color: #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step h2::before {
+            content: "→";
+            color: #3498db;
         }
         img {
             max-width: 100%;
@@ -31,8 +40,9 @@
         .note {
             background: #fff3cd;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin: 10px 0;
+            border-left: 4px solid #ffc107;
         }
         .back-button {
             display: inline-block;
@@ -40,105 +50,126 @@
             background-color: #3498db;
             color: white;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
         .back-button:hover {
             background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        .feature-list li::before {
+            content: "•";
+            color: #3498db;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-button">← Back to App</a>
-    <h1>How to Use the Data Collection App</h1>
+    <a href="index.html" class="back-button">← Back to System</a>
+    <h1>Research Data Management System Guide</h1>
 
     <div class="step">
-        <h2>Step 1: Installation</h2>
-        <p>1. Open Safari on your iPad</p>
-        <p>2. Add the app to your home screen for the best experience:</p>
-        <ul>
-            <li>Tap the share button at the bottom of Safari</li>
-            <li>Scroll and tap "Add to Home Screen"</li>
-            <li>Tap "Add" in the popup dialog</li>
+        <h2>Quick Start</h2>
+        <p>The Research Data Management System is designed for efficient data collection and management in clinical settings. Here are the key features:</p>
+        <ul class="feature-list">
+            <li>Fast data entry with minimal required fields</li>
+            <li>Real-time search functionality</li>
+            <li>Automatic status tracking for complete/incomplete records</li>
+            <li>Secure offline data storage</li>
+            <li>Easy data export capability</li>
         </ul>
     </div>
 
     <div class="step">
-        <h2>Step 2: Basic Usage</h2>
-        <p><strong>Adding New Records:</strong></p>
-        <ul>
-            <li>Initial is required, other fields can be filled later</li>
-            <li>Enter the patient's initial</li>
-            <li>Optionally fill in age, gender, and type</li>
-            <li>Click "Save" to store the record</li>
+        <h2>Data Entry</h2>
+        <p><strong>Required Information:</strong></p>
+        <ul class="feature-list">
+            <li>Participant initial (required for initial save)</li>
+            <li>Age Group (select from predefined ranges)</li>
+            <li>Gender (Male/Female)</li>
+            <li>Disease Type (select from predefined options)</li>
+        </ul>
+        <p><strong>Tips:</strong></p>
+        <ul class="feature-list">
+            <li>You can save a record with just the Participant initial and complete other fields later</li>
+            <li>Incomplete records are clearly marked for easy identification</li>
+            <li>The system automatically saves your work</li>
         </ul>
     </div>
 
     <div class="step">
-        <h2>Step 3: Managing Records</h2>
-        <p><strong>Searching Records:</strong></p>
-        <ul>
-            <li>Use the search box above the records list</li>
-            <li>Type the patient's initial to filter records</li>
-            <li>Matching text will be highlighted</li>
+        <h2>Managing Records</h2>
+        <p><strong>Search Function:</strong></p>
+        <ul class="feature-list">
+            <li>Quick search by Participant initial in the top-right of records section</li>
+            <li>Real-time filtering as you type</li>
+            <li>Matching text is highlighted for easy identification</li>
+            <li>Search results count is displayed</li>
         </ul>
         
-        <p><strong>Editing Records:</strong></p>
-        <ul>
-            <li>Click "Edit" on any record to modify it</li>
-            <li>Initial cannot be changed once saved</li>
-            <li>Other fields can be updated at any time</li>
+        <p><strong>Record Actions:</strong></p>
+        <ul class="feature-list">
+            <li>View Details: Expand/collapse record information</li>
+            <li>Edit: Modify any field except Participant initial</li>
+            <li>Delete: Remove records (requires confirmation)</li>
         </ul>
         
-        <p><strong>Incomplete Records:</strong></p>
-        <ul>
-            <li>Records with missing fields are highlighted in red</li>
-            <li>Missing fields are listed below each record</li>
-            <li>All fields must be completed before exporting</li>
+        <p><strong>Status Tracking:</strong></p>
+        <ul class="feature-list">
+            <li>Complete records are marked with a green status</li>
+            <li>Incomplete records show missing fields in red</li>
+            <li>All required fields must be filled before export</li>
         </ul>
     </div>
 
     <div class="step">
-        <h2>Step 4: Exporting Data</h2>
-        <ul>
-            <li>Click "Export Data" to download records as CSV</li>
-            <li>All records must be complete before exporting</li>
-            <li>Export includes: Initial, Age, Gender, Type, and Timestamp</li>
-            <li>Regular exports are recommended for backup</li>
+        <h2>Data Export</h2>
+        <ul class="feature-list">
+            <li>Export all records to CSV format</li>
+            <li>Includes timestamps for audit tracking</li>
+            <li>Exported data can be opened in Excel or similar applications</li>
+            <li>Regular exports are recommended for data backup</li>
         </ul>
     </div>
 
     <div class="note">
         <h3>Important Notes:</h3>
-        <ul>
-            <li>The app works completely offline</li>
-            <li>All data is stored locally on your device</li>
-            <li>Regular data exports are recommended for backup</li>
-            <li>The app will automatically update when online</li>
+        <ul class="feature-list">
+            <li>All data is stored securely on your device</li>
+            <li>No internet connection required for basic operations</li>
+            <li>Export your data regularly for backup</li>
+            <li>The system will notify you of any incomplete records</li>
         </ul>
     </div>
 
     <div class="step">
-        <h2>Troubleshooting:</h2>
-        <p><strong>Issue 1: Can't find "Add to Home Screen"?</strong><br>
-        Make sure you're using Safari browser, as other browsers may not support this feature.</p>
-        
-        <p><strong>Issue 2: App not working offline?</strong><br>
-        Ensure you've opened the app at least once while online to cache all necessary files.</p>
-        
-        <p><strong>Issue 3: Data not saving?</strong><br>
-        Make sure you're not using Safari's private browsing mode and have sufficient storage space.</p>
+        <h2>Best Practices</h2>
+        <ul class="feature-list">
+            <li>Complete all fields as soon as information is available</li>
+            <li>Use the search function to check for existing records before creating new ones</li>
+            <li>Export data at the end of each session</li>
+            <li>Review incomplete records regularly</li>
+        </ul>
     </div>
 
     <div class="note">
-        <h3>Technical Support:</h3>
-        <p>If you encounter issues, please check:</p>
-        <ul>
-            <li>Safari is updated to the latest version</li>
-            <li>Necessary permissions are granted</li>
-            <li>Sufficient device storage is available</li>
-            <li>You're not in private browsing mode</li>
-            <li>If the problem persists, please contact the developer Shibo: <a href="mailto:e1124313@u.nus.edu">e1124313@u.nus.edu</a></li>
+        <h3>Need Help?</h3>
+        <p>If you encounter any issues or have questions, please contact:</p>
+        <ul class="feature-list">
+            <li>Technical Support: <a href="mailto:e1124313@u.nus.edu">e1124313@u.nus.edu</a></li>
+            <li>Response time: Work time on weekdays</li>
         </ul>
     </div>
 </body>
