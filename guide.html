@@ -81,95 +81,113 @@
     <h1>Research Data Management System Guide</h1>
 
     <div class="step">
-        <h2>Quick Start</h2>
-        <p>The Research Data Management System is designed for efficient data collection and management in clinical settings. Here are the key features:</p>
+        <h2>System Overview</h2>
+        <p>Welcome to the Clinical Data Collection System, a web-based tool designed for efficient data management in clinical research settings.</p>
         <ul class="feature-list">
-            <li>Fast data entry with minimal required fields</li>
-            <li>Real-time search functionality</li>
-            <li>Automatic status tracking for complete/incomplete records</li>
-            <li>Secure offline data storage</li>
-            <li>Easy data export capability</li>
+            <li>Streamlined data entry interface</li>
+            <li>Powerful search and filtering capabilities</li>
+            <li>Secure local data storage</li>
+            <li>CSV export functionality</li>
+            <li>Real-time data persistence</li>
         </ul>
     </div>
 
     <div class="step">
-        <h2>Data Entry</h2>
-        <p><strong>Required Information:</strong></p>
+        <h2>System Requirements</h2>
         <ul class="feature-list">
-            <li>Participant initial (required for initial save)</li>
-            <li>Age Group (select from predefined ranges)</li>
-            <li>Gender (Male/Female)</li>
-            <li>Disease Type (select from predefined options)</li>
+            <li>Internet connection required to access the application via GitHub Pages</li>
+            <li>Compatible with modern web browsers (Chrome, Firefox, Safari, Edge)</li>
+            <li>No additional software installation needed</li>
         </ul>
-        <p><strong>Tips:</strong></p>
+        <div class="note">
+            <p><strong>Important Note:</strong> While the application requires internet connection to access, all your data is stored securely on your local device.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <h2>Data Entry Guidelines</h2>
+        <p><strong>Core Data Fields:</strong></p>
         <ul class="feature-list">
-            <li>You can save a record with just the Participant initial and complete other fields later</li>
-            <li>Incomplete records are clearly marked for easy identification</li>
-            <li>The system automatically saves your work</li>
+            <li>Participant Initial (Primary identifier, mandatory)</li>
+            <li>Age Group (Standardized ranges)</li>
+            <li>Gender (Binary selection)</li>
+            <li>Disease Type (Predefined categories)</li>
+        </ul>
+        <p><strong>Entry Process:</strong></p>
+        <ul class="feature-list">
+            <li>Initial save requires only Participant Initial</li>
+            <li>Additional fields can be completed progressively</li>
+            <li>Auto-save feature ensures data persistence</li>
+            <li>Visual indicators for required fields</li>
         </ul>
     </div>
 
     <div class="step">
-        <h2>Managing Records</h2>
-        <p><strong>Search Function:</strong></p>
+        <h2>Data Storage & Security</h2>
+        <p><strong>Local Storage:</strong></p>
         <ul class="feature-list">
-            <li>Quick search by Participant initial in the top-right of records section</li>
-            <li>Real-time filtering as you type</li>
-            <li>Matching text is highlighted for easy identification</li>
-            <li>Search results count is displayed</li>
+            <li>All data is stored securely on your device</li>
+            <li>Data remains accessible even after closing the browser</li>
+            <li>No data is transmitted to external servers</li>
+            <li>Regular data exports recommended for backup</li>
         </ul>
         
-        <p><strong>Record Actions:</strong></p>
+        <p><strong>Data Management:</strong></p>
         <ul class="feature-list">
-            <li>View Details: Expand/collapse record information</li>
-            <li>Edit: Modify any field except Participant initial</li>
-            <li>Delete: Remove records (requires confirmation)</li>
+            <li>Automatic data persistence using IndexedDB</li>
+            <li>Fallback to localStorage if needed</li>
+            <li>Export functionality for data backup</li>
+            <li>Data integrity checks during operations</li>
+        </ul>
+    </div>
+
+    <div class="step">
+        <h2>Record Management</h2>
+        <p><strong>Search Capabilities:</strong></p>
+        <ul class="feature-list">
+            <li>Dynamic search by Participant Initial</li>
+            <li>Instant results with highlighted matches</li>
+            <li>Result count indicator</li>
+            <li>Filter functionality for efficient data retrieval</li>
         </ul>
         
-        <p><strong>Status Tracking:</strong></p>
+        <p><strong>Record Operations:</strong></p>
         <ul class="feature-list">
-            <li>Complete records are marked with a green status</li>
-            <li>Incomplete records show missing fields in red</li>
-            <li>All required fields must be filled before export</li>
+            <li>View: Expand/collapse record details</li>
+            <li>Edit: Update all fields except Participant Initial</li>
+            <li>Delete: Remove records with confirmation</li>
+            <li>Status Tracking: Visual indicators for completion status</li>
         </ul>
     </div>
 
     <div class="step">
         <h2>Data Export</h2>
         <ul class="feature-list">
-            <li>Export all records to CSV format</li>
-            <li>Includes timestamps for audit tracking</li>
-            <li>Exported data can be opened in Excel or similar applications</li>
-            <li>Regular exports are recommended for data backup</li>
-        </ul>
-    </div>
-
-    <div class="note">
-        <h3>Important Notes:</h3>
-        <ul class="feature-list">
-            <li>All data is stored securely on your device</li>
-            <li>No internet connection required for basic operations</li>
-            <li>Export your data regularly for backup</li>
-            <li>The system will notify you of any incomplete records</li>
+            <li>One-click CSV export</li>
+            <li>Complete audit trail with timestamps</li>
+            <li>Excel-compatible format</li>
+            <li>Regular exports recommended for data backup</li>
         </ul>
     </div>
 
     <div class="step">
         <h2>Best Practices</h2>
         <ul class="feature-list">
-            <li>Complete all fields as soon as information is available</li>
-            <li>Use the search function to check for existing records before creating new ones</li>
-            <li>Export data at the end of each session</li>
-            <li>Review incomplete records regularly</li>
+            <li>Export data regularly for backup purposes</li>
+            <li>Complete all fields as information becomes available</li>
+            <li>Use search function to avoid duplicate entries</li>
+            <li>Review incomplete records periodically</li>
+            <li>Keep browser updated for optimal performance</li>
         </ul>
     </div>
 
     <div class="note">
-        <h3>Need Help?</h3>
-        <p>If you encounter any issues or have questions, please contact:</p>
+        <h3>Support Information</h3>
+        <p>For technical assistance or inquiries:</p>
         <ul class="feature-list">
-            <li>Technical Support: <a href="mailto:e1124313@u.nus.edu">e1124313@u.nus.edu</a></li>
-            <li>Response time: Work time on weekdays</li>
+            <li>Email Support: <a href="mailto:e1124313@u.nus.edu">e1124313@u.nus.edu</a></li>
+            <li>Support Hours: Business hours on weekdays</li>
+            <li>Response Time: Within 24 hours during business days</li>
         </ul>
     </div>
 </body>
