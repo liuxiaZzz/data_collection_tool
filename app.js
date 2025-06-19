@@ -1033,15 +1033,23 @@ async function showRestoreDialog() {
                 background-color: #1e88e5;
                 color: white;
                 cursor: pointer;
-                transition: background-color 0.3s;
+                transition: all 0.3s ease;
                 display: flex;
                 align-items: center;
                 gap: 5px;
                 min-width: 90px;
                 justify-content: center;
+                outline: none;
             }
             .restore-btn:hover {
                 background-color: #1565c0;
+            }
+            .restore-btn:active {
+                background-color: #4a148c;
+                transform: scale(0.98);
+            }
+            .restore-btn:focus {
+                box-shadow: 0 0 0 2px rgba(74, 20, 140, 0.2);
             }
             .choose-file-btn {
                 padding: 10px 20px;
